@@ -116,28 +116,20 @@ tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
 
+//this is virtual populate
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id'
+});
+
 // DOCUMENT MIDDLEWARE: runs before .save() and .create()
 tourSchema.pre('save', function(next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
 
-//***********This will embedd the tour guides inside the tours */
-// tourSchema.pre('save', async function(next) {
-//   const guidesPromises = this.guides.map(async id => await User.findById(id));
-//   this.guides = await Promise.all(guidesPromises);
-//   next();
-// });
 
-// tourSchema.pre('save', function(next) {
-//   console.log('Will save document...');
-//   next();
-// });
-
-// tourSchema.post('save', function(doc, next) {
-//   console.log(doc);
-//   next();
-// });
 
 // QUERY MIDDLEWARE
 // tourSchema.pre('find', function(next) {
