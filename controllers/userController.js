@@ -3,18 +3,7 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const factory = require('./handlerFactory');
 
-exports.getAllUsers = catchAsync(async (req, res) => {
-  const users = await User.find();
 
-  // SEND RESPONSE
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users
-    }
-  });
-});
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -72,10 +61,12 @@ exports.getUser = (req, res) => {
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
-    message: 'This route is not yet defined!'
+    message: 'This route is not yet defined! and will never be defined'
   });
 };
 //do not change password with this
-exports.updateUser = factory.updateOne(User)
+exports.updateUser = factory.updateOne(User);
+
+exports.getAllUsers = factory.getAll(User);
 
 exports.deleteUser = factory.deleteOne(User);
