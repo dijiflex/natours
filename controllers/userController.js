@@ -3,8 +3,6 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const factory = require('./handlerFactory');
 
-
-
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
   Object.keys(obj).forEach(el => {
@@ -22,6 +20,11 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null
   });
 });
+
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   //1) create an error if the user posts password data
@@ -51,12 +54,13 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined!'
-  });
-};
+exports.getUser = factory.getOne(User);
+// {
+//   res.status(500).json({
+//     status: 'error',
+//     message: 'This route is not yet defined!'
+//   });
+// };
 
 exports.createUser = (req, res) => {
   res.status(500).json({
