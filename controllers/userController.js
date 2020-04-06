@@ -55,12 +55,6 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 
 exports.getUser = factory.getOne(User);
-// {
-//   res.status(500).json({
-//     status: 'error',
-//     message: 'This route is not yet defined!'
-//   });
-// };
 
 exports.createUser = (req, res) => {
   res.status(500).json({
