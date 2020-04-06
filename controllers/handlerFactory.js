@@ -65,7 +65,7 @@ exports.getOne = (Model, popOptions) =>
       }
     });
   });
-  
+
 exports.getAll = Model =>
   catchAsync(async (req, res, next) => {
     //to allow for nested get reviews on tour
@@ -78,6 +78,7 @@ exports.getAll = Model =>
       .limitFields()
       .paginate();
     const doc = await features.query;
+    // const doc = await features.query.explain();
 
     // SEND RESPONSE
     res.status(200).json({
@@ -88,5 +89,3 @@ exports.getAll = Model =>
       }
     });
   });
-
-
