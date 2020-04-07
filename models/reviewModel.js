@@ -34,6 +34,8 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 reviewSchema.pre(/^find/, function(next) {
   //   this.populate({ path: 'tour', select: 'name' }).populate({
   //     path: 'user',
@@ -47,6 +49,8 @@ reviewSchema.pre(/^find/, function(next) {
 
   next();
 });
+
+
 
 //static methods
 reviewSchema.statics.calcAverageRatings = async function(tourId) {
@@ -63,17 +67,35 @@ reviewSchema.statics.calcAverageRatings = async function(tourId) {
     }
   ]);
   console.log(stats);
-  
-
-  await Tour.findByIdAndUpdate(tourId, {
-    ratingsQuantity: stats[0].nRating,
-    ratingsAverage: stats[0].avgRating
-  });
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5
+    });
+  }
 };
+
+ //this ensures that a user can only review a tour once
 
 reviewSchema.post('save', function() {
   //this point to to the current review
   this.constructor.calcAverageRatings(this.tour);
+});
+
+reviewSchema.pre(/^findOneAnd/, async function(next) {
+  this.r = await this.findOne();
+  console.log(this.r.tour);
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function() {
+  //await this.findOne(); does not work here because query has already been executed
+  await this.r.constructor.calcAverageRatings(this.r.tour);
 });
 
 const Review = mongoose.model('Review', reviewSchema);
