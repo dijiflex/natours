@@ -1,8 +1,7 @@
 const Tour = require('./../models/tourModel');
-const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
-const AppError = require('./../utils/appError');
 const factory = require('./handlerFactory');
+const AppError = require('./../utils/appError');
 
 exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
@@ -12,12 +11,9 @@ exports.aliasTopTours = (req, res, next) => {
 };
 
 exports.getAllTours = factory.getAll(Tour);
-
 exports.getTour = factory.getOne(Tour, { path: 'reviews' });
 exports.createTour = factory.createOne(Tour);
-
 exports.updateTour = factory.updateOne(Tour);
-
 exports.deleteTour = factory.deleteOne(Tour);
 
 exports.getTourStats = catchAsync(async (req, res, next) => {
@@ -98,23 +94,26 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
   });
 });
 
+// /tours-within/:distance/center/:latlng/unit/:unit
+// /tours-within/233/center/34.111745,-118.113491/unit/mi
 exports.getToursWithin = catchAsync(async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
   const [lat, lng] = latlng.split(',');
 
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+
   if (!lat || !lng) {
     next(
-      new AppError('Please provide lat and long in the format like this', 400)
+      new AppError(
+        'Please provide latitutr and longitude in the format lat,lng.',
+        400
+      )
     );
   }
 
-  const radious = unit === 'mi' ? distance / 3963.2 : distance / 6378.1; //mongo expresct the distacne to be in radins
-
   const tours = await Tour.find({
-    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radious] } }
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }
   });
-
-  console.log(distance, lat, lng, unit);
 
   res.status(200).json({
     status: 'success',
@@ -133,7 +132,10 @@ exports.getDistances = catchAsync(async (req, res, next) => {
 
   if (!lat || !lng) {
     next(
-      new AppError('Please provide lat and long in the format like this', 400)
+      new AppError(
+        'Please provide latitutr and longitude in the format lat,lng.',
+        400
+      )
     );
   }
 
@@ -149,7 +151,7 @@ exports.getDistances = catchAsync(async (req, res, next) => {
       }
     },
     {
-      $project:{
+      $project: {
         distance: 1,
         name: 1
       }

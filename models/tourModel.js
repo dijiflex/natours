@@ -36,7 +36,7 @@ const tourSchema = new mongoose.Schema(
       default: 4.5,
       min: [1, 'Rating must be above 1.0'],
       max: [5, 'Rating must be below 5.0'],
-      set: val => Math.round(val * 10) / 10
+      set: val => Math.round(val * 10) / 10 // 4.666666, 46.6666, 47, 4.7
     },
     ratingsQuantity: {
       type: Number,
@@ -81,7 +81,7 @@ const tourSchema = new mongoose.Schema(
       default: false
     },
     startLocation: {
-      //GeoJSON
+      // GeoJSON
       type: {
         type: String,
         default: 'Point',
@@ -98,15 +98,19 @@ const tourSchema = new mongoose.Schema(
           default: 'Point',
           enum: ['Point']
         },
-        coordinates: ['Number'],
+        coordinates: [Number],
         address: String,
         description: String,
         day: Number
       }
     ],
-    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }]
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+    ]
   },
-
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
@@ -122,7 +126,7 @@ tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
 
-//this is virtual populate
+// Virtual populate
 tourSchema.virtual('reviews', {
   ref: 'Review',
   foreignField: 'tour',
@@ -135,6 +139,22 @@ tourSchema.pre('save', function(next) {
   next();
 });
 
+// tourSchema.pre('save', async function(next) {
+//   const guidesPromises = this.guides.map(async id => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
+
+// tourSchema.pre('save', function(next) {
+//   console.log('Will save document...');
+//   next();
+// });
+
+// tourSchema.post('save', function(doc, next) {
+//   console.log(doc);
+//   next();
+// });
+
 // QUERY MIDDLEWARE
 // tourSchema.pre('find', function(next) {
 tourSchema.pre(/^find/, function(next) {
@@ -143,6 +163,7 @@ tourSchema.pre(/^find/, function(next) {
   this.start = Date.now();
   next();
 });
+
 tourSchema.pre(/^find/, function(next) {
   this.populate({
     path: 'guides',

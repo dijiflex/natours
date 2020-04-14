@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 
 process.on('uncaughtException', err => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
-  console.log(err.name, err.message, err);
+  console.log(err.name, err.message);
   process.exit(1);
 });
 
@@ -14,14 +14,14 @@ const app = require('./app');
 //   '<PASSWORD>',
 //   process.env.DATABASE_PASSWORD
 // );
+
 const DB = process.env.DATABASE_LOCAL;
 
 mongoose
   .connect(DB, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true
+    useFindAndModify: false
   })
   .then(() => console.log('DB connection successful!'));
 
@@ -30,10 +30,9 @@ const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);
 });
 
-//Handling unhandled rection globaly
 process.on('unhandledRejection', err => {
   console.log('UNHANDLED REJECTION! 💥 Shutting down...');
-  console.log(err.name, err);
+  console.log(err.name, err.message);
   server.close(() => {
     process.exit(1);
   });
