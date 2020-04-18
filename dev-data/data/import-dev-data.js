@@ -33,9 +33,9 @@ const importData = async () => {
     await Tour.create(tours);
     await User.create(users, { validateBeforeSave: false });
     await Review.create(reviews);
-    console.log('Data successfully loaded!');
+    // console.log('Data successfully loaded!');
   } catch (err) {
-    console.log(err);
+    // console.log(err);
   }
   process.exit();
 };
@@ -48,7 +48,7 @@ const deleteData = async () => {
     await Review.deleteMany();
     console.log('Data successfully deleted!');
   } catch (err) {
-    console.log(err);
+    // console.log(err);
   }
   process.exit();
 };
