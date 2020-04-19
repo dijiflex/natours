@@ -7,7 +7,6 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-
 dotenv.config({ path: './config.env' });
 const app = require('./app');
 
@@ -36,5 +35,12 @@ process.on('unhandledRejection', err => {
   console.log(err.name, err.message);
   server.close(() => {
     process.exit(1);
+  });
+});
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM RECEIVED DOWN 🥱🥱');
+  server.close(() => {
+    console.log(' 💥 Process Terminate');
   });
 });
